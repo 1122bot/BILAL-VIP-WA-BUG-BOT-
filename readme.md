@@ -1,76 +1,73 @@
-# ⚡ BILAL VIP BOT — WhatsApp MD Pairing System
+# BILAL WA BOT WEB
 
-Permanent **Vercel domain** + switchable **Pterodactyl / VPS** backend.
-Panel badlein — domain same rahega, sirf `config.json` update karein.
+A multi-number WhatsApp bot with a web dashboard, pairing flow, and admin console. The project has two parts:
 
-```
-Browser ──► Vercel (permanent) ──► GitHub raw config.json ──► Active Panel (Baileys + MongoDB)
-```
+- **Backend:** A Node.js service that runs the WhatsApp bot, pairing API, and admin API. It must run on an always-on server with persistent storage.
+- **Frontend:** A static website that can be hosted separately, including on Vercel.
 
-## ✨ Features
+> **Important:** Vercel hosts the frontend only. It does not run this project's WhatsApp bot backend or provide the persistent storage needed for WhatsApp sessions.
 
-- 🔗 **Permanent domain** — panel change par Vercel redeploy nahi
-- 🔄 **Zero-cache config** — har request par fresh `config.json` (no-store)
-- 📱 **Web pairing** — 8-character WhatsApp pairing code
-- 🛡️ **Admin panel** — Free Mode ON/OFF, access keys, sessions, logs
-- 🗄️ **MongoDB session backup** — restart / migrate ke baad re-pair nahi
-- ♻️ **Auto-reconnect** — Baileys built-in reconnect handling
-- 🎨 **Dark neon UI** — BILAL VIP BOT branding, mobile friendly
+## Features
 
-## 📂 Structure
+- Pair and manage multiple WhatsApp numbers from a web dashboard.
+- Keep each number's session and bot data separate.
+- Use Free Mode for guest access or require admin-created access keys.
+- Manage access keys, sessions, and Free Mode in the admin console at `/admin`.
+- Review recent message logs in the admin console. Logs are held in memory and are not retained after a backend restart.
+- Configure the Telegram and WhatsApp community links shown on the website.
 
-| Path | Kya hai |
-|---|---|
-| `config.json` | **Sirf ye** update karein panel badalne par |
-| `api/pair.js` | Pairing proxy (config → panel `/api/pair`) |
-| `api/[...path].js` | Baaki `/api/*` calls ka transparent proxy |
-| `vercel.json` | Frontend build + routing + no-cache headers |
-| `backend/index.js` | Bot + session boot / restore |
-| `backend/web-server.js` | Pairing + admin + free mode API |
-| `backend/mongo-session.js` | MongoDB session backup / restore |
-| `frontend/` | Pairing page + admin console (build → `dist`) |
-| `SETUP_AND_DEPLOY.md` | **Poora step-by-step guide (Roman Urdu)** |
+## Project layout
 
-## 🚀 Quick Start
-
-1. **MongoDB Atlas** free cluster → connection string
-2. **Panel**: repo upload → `npm install` → env vars → `node index.js`
-3. **`config.json`**: `panel_backend_url` + `api_secret` (panel ke `API_SECRET` se same)
-4. **Vercel**: repo import → build `cd frontend && npm run build` → output `frontend/dist`
-5. Site kholein → number daalein → code copy karein
-6. Admin: `https://<panel-host>/admin`
-
-Detailed: **[SETUP_AND_DEPLOY.md](SETUP_AND_DEPLOY.md)**
-
-## 🔑 Panel Env
-
-```env
-PORT=3000
-MONGODB_URI=mongodb+srv://...
-API_SECRET=same_as_config_json
-ADMIN_PASSWORD=32_plus_characters
-MAX_SESSIONS=10
-SESSION_BACKUP_INTERVAL_MS=45000
+```text
+.
+├── backend/       # WhatsApp bot, API, configuration, and runtime data
+├── frontend/      # Static dashboard and Vercel configuration
+├── .env.example   # Backend environment variable template
+├── package.json   # Backend start command
+└── readme.md
 ```
 
-## 🔌 API
+For detailed local setup, GitHub preparation, and Vercel deployment instructions, see [SETUP_AND_DEPLOY.md](./SETUP_AND_DEPLOY.md).
 
-| Endpoint | Description |
-|---|---|
-| `GET /api/health` | Proxy health |
-| `POST /api/pair` `{phone}` | Pairing code (Vercel proxy) |
-| `POST /api/pair` `{phoneNumber}` | Pairing code (panel, auth required) |
-| `GET /api/public-config` | Free mode + community links |
-| `POST /api/auth/guest` | Guest session (free mode ON) |
-| `POST /api/auth/admin-login` | Admin login |
-| `GET /api/admin/overview` | Admin dashboard data |
-| `POST /api/admin/free-mode` `{enabled}` | Free Mode ON/OFF |
+## Quick start
 
-## ⚠️ Disclaimer
+Requirements: Node.js 18 or later and npm.
 
-Baileys unofficial library hai. WhatsApp Terms of Service ki paband rahein.
-Spam / bulk messaging se account ban ho sakta hai.
+1. Install the root and frontend dependencies:
 
----
+   ```sh
+   npm install
+   npm --prefix frontend install
+   ```
 
-Base by TdX Division · Owner: t.me/bilal_babar_982
+2. Copy `.env.example` to `.env` in the project root and set a unique `ADMIN_PASSWORD` of at least 32 characters. Keep `.env` private.
+3. Start the backend:
+
+   ```sh
+   npm start
+   ```
+
+4. Open `http://localhost:3000` (or the configured `PORT`). The backend serves the locally built dashboard as well as the API.
+
+To generate a random admin password with Node.js:
+
+```sh
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+## Deployment overview
+
+1. Run the backend on an always-on Node.js host (including Pterodactyl) with persistent storage for `backend/sessions/`, `backend/user-data/`, and the backend's website data files.
+2. Deploy the `frontend/` directory to Vercel. Set `BACKEND_API_URL` to the backend's public URL and redeploy.
+3. Set the backend's `CORS_ORIGIN` to the exact Vercel site origin (and any custom frontend domain).
+
+See [SETUP_AND_DEPLOY.md](./SETUP_AND_DEPLOY.md) for step-by-step instructions.
+
+## Important data and security notes
+
+- Never commit or share `.env`, WhatsApp session credentials, API keys, access databases, or backups containing private data.
+- The repository `.gitignore` excludes `.env`, dependencies, session folders, per-number user data, and generated frontend output. Review `git status` before pushing, especially if you have moved or renamed runtime data.
+- Back up the backend's session and user data securely. Losing WhatsApp session files may require pairing the number again.
+- Keep `ADMIN_PASSWORD` on the backend host only. Do not put it in Vercel environment variables or frontend code.
+- Use an HTTPS public backend URL when the frontend is served over HTTPS.
+- Free Mode is controlled from `/admin` and stored by the backend; it is not configured through an environment variable.

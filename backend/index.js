@@ -95,7 +95,6 @@ const { Boom } = require("@hapi/boom")
 const moment = require("moment-timezone")
 const NodeCache = require("node-cache")
 const { startWebServer } = require("./web-server");
-const mongoSessions = require("./mongo-session.js");
 //==========================================//
 const { 
 makeWASocket, 
@@ -362,23 +361,11 @@ throw error;
 }
 if (clients.get(number) === sock) clients.delete(number);
 fs.rmSync(path.join(__dirname, "sessions", number), { recursive: true, force: true });
-mongoSessions.deleteSession(number).catch(() => {});
 sessionStatuses.delete(number);
 messageLogs.clear(number);
 }
 
 async function boot() {
-// MongoDB se sessions restore karein (panel restart ke baad re-pair na karna pade)
-try {
-const mongoReady = await mongoSessions.init();
-if (mongoReady) {
-const restored = await mongoSessions.restoreAll();
-console.log(`[mongo] ${restored} session(s) restored from MongoDB`);
-}
-} catch (error) {
-console.error("[mongo] Session backup init failed:", error.message);
-}
-
 const legacyCreds = path.join(__dirname, "session", "creds.json");
 if (fs.existsSync(legacyCreds)) await start(null);
 
@@ -397,9 +384,6 @@ removeSession,
 getMessageLogs: (number, limit) => messageLogs.get(number, limit),
 getSessions: () => Array.from(sessionStatuses.values()),
 });
-
-// Har 45 second mein sessions MongoDB mein backup karein
-if (mongoSessions.isEnabled()) mongoSessions.startAutoBackup();
 }
 
 boot().catch(error => {

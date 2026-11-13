@@ -9,8 +9,8 @@
   --line: rgba(255, 255, 255, 0.08);
   --muted: #a7a5ab;
   --text: #f4f2ee;
-  --gold: #00ffb2;
-  --gold-strong: #9dffe0;
+  --gold: #d9bb78;
+  --gold-strong: #f0d79b;
   --success: #79ba8a;
   --warning: #f3ca74;
   --danger: #ef8d8d;
@@ -29,7 +29,7 @@ body {
   margin: 0;
   overflow-x: hidden;
   background:
-    radial-gradient(1200px 500px at 50% 0%, rgba(0, 255, 178, 0.12), transparent 45%),
+    radial-gradient(1200px 500px at 50% 0%, rgba(217, 187, 120, 0.12), transparent 45%),
     radial-gradient(800px 500px at 85% 30%, rgba(146, 169, 255, 0.12), transparent 35%),
     var(--bg);
   color: var(--text);
@@ -183,8 +183,8 @@ h1 span { color: var(--gold-strong); }
   box-shadow: inset 0 1px rgba(255,255,255,0.02), 0 18px 30px rgba(0,0,0,0.12);
 }
 .stat-card.accent {
-  background: linear-gradient(135deg, rgba(0, 255, 178, 0.18), rgba(0, 255, 178, 0.04));
-  border-color: rgba(0, 255, 178, 0.22);
+  background: linear-gradient(135deg, rgba(217, 187, 120, 0.18), rgba(217, 187, 120, 0.04));
+  border-color: rgba(217, 187, 120, 0.22);
 }
 .stat-label {
   color: var(--muted);

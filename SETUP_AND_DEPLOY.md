@@ -1,249 +1,160 @@
-# 🔐 BILAL VIP BOT — Permanent Vercel Domain + Switchable Panel
+# Setup and GitHub-to-Vercel Deployment
 
-Ye guide aap ke **existing script** (web pairing + admin panel + free mode) ke upar naya
-"permanent domain" layer install karti hai.
+This guide covers local setup, preparing the project for GitHub, running the backend, and deploying the static frontend to Vercel.
 
-**Faida:** Vercel ka domain kabhi change nahi hoga. Panel ya port badalne par sirf
-`config.json` update karein — Vercel par kuch nahi karna.
+## 1. Requirements
 
-```
-Browser
-   │  https://bilal-vip-bot.vercel.app   (permanent)
-   ▼
-Vercel  ──►  GitHub raw config.json  (har request par fresh, no-cache)
-   │              │
-   │              └─ panel_backend_url + api_secret
-   ▼
-Active Panel (Pterodactyl / VPS)
-   ├─ /api/pair        → 8-character pairing code
-   ├─ /api/auth/*      → guest / access key / admin login
-   ├─ /api/admin/*     → free mode, keys, sessions, logs
-   └─ MongoDB          → session backup (restart-proof)
-```
+- Node.js 18 or later and npm
+- A GitHub account and Git installed locally
+- A Vercel account connected to GitHub
+- An always-on Node.js server for the WhatsApp bot backend
 
----
+Vercel is used for the static frontend only. Keep the bot backend on a separate Node.js host that provides persistent disk storage. Do not deploy the WhatsApp backend as a Vercel Function: WhatsApp connections and session files need a long-running process and persistent storage.
 
-## 📁 Naye / Updated Files
+## 2. Install and run locally
 
-| File | Kya karta hai |
-|---|---|
-| `config.json` | **Sirf ye** update karein panel badalne par |
-| `api/pair.js` | Pairing proxy: config → panel `/api/pair` → code |
-| `api/[...path].js` | Baaki saare `/api/*` calls ko panel par forward karta hai |
-| `vercel.json` | Frontend build + routing + no-cache headers |
-| `backend/mongo-session.js` | Sessions ka MongoDB backup / restore |
-| `backend/index.js` | Boot par restore + auto backup hook |
-| `frontend/*` | Aap ka existing UI (BILAL VIP BOT neon branding) |
+From the project root, install both sets of dependencies:
 
----
-
-# STEP 1 — MongoDB (sessions ko restart-proof banane ke liye)
-
-1. [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) par free **M0** cluster banayein.
-2. **Database Access** → user banayein (username + strong password).
-3. **Network Access** → `0.0.0.0/0` allow karein (Pterodactyl node ka IP badalta hai).
-4. **Connect → Drivers** se connection string copy karein:
-
-```
-mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/bilalvip?retryWrites=true&w=majority
-```
-
-> `MONGODB_URI` na dein to bot phir bhi chalega, lekin restart par sessions sirf
-> panel ke local disk se restore honge (panel migrate karne par users disconnect ho sakte hain).
-
----
-
-# STEP 2 — Panel Deploy (Pterodactyl / VPS)
-
-### 2.1 Files
-
-Pterodactyl File Manager mein poora repo upload karein (ya `git clone`), phir:
-
-```bash
+```sh
 npm install
+npm --prefix frontend install
 ```
 
-### 2.2 Environment Variables (Startup tab)
+Create a root-level `.env` from the example file.
 
-| Variable | Value |
-|---|---|
-| `PORT` | allocated port (e.g. `3000`) |
-| `MONGODB_URI` | `mongodb+srv://...` |
-| `MONGODB_DB` | `bilalvip` *(optional)* |
-| `API_SECRET` | lamba random secret — **config.json se same** |
-| `ADMIN_PASSWORD` | 32+ characters ka strong password |
-| `MAX_SESSIONS` | `10` (ya jitne chahiye) |
-| `CORS_ORIGIN` | `https://your-app.vercel.app` *(optional)* |
-| `SESSION_BACKUP_INTERVAL_MS` | `45000` *(optional)* |
+PowerShell:
 
-> ⚠️ `ADMIN_PASSWORD` kam az kam **32 characters** hona chahiye, warna admin login
-> `503` dega (ye aap ke script ka built-in safety check hai).
-
-### 2.3 Start
-
-```
-node index.js
+```powershell
+Copy-Item .env.example .env
 ```
 
-Console mein ye dikhna chahiye:
+macOS, Linux, or Git Bash:
 
-```
-[mongo] Connected — session backup enabled.
-[mongo] 0 session(s) restored from MongoDB
-🚀 web server listening ...
-[mongo] Auto session backup every 45s.
+```sh
+cp .env.example .env
 ```
 
-### 2.4 Panel URL
+Set `ADMIN_PASSWORD` in `.env` to a unique random value of at least 32 characters. Generate one with:
 
-```
-https://panel-1.yourhost.com
-```
-
-Browser mein kholein — pairing page ya JSON response aana chahiye.
-Admin: `https://panel-1.yourhost.com/admin`
-
----
-
-# STEP 3 — GitHub `config.json`
-
-Repo → `config.json` → Edit:
-
-```json
-{
-  "panel_backend_url": "https://panel-1.yourhost.com",
-  "api_secret": "same_as_panel_API_SECRET",
-  "brand_name": "BILAL VIP BOT"
-}
+```sh
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Commit. **Bas itna hi.** Vercel har request par ye file fresh fetch karta hai.
+The template also includes `HOST`, `PORT`, `MAX_SESSIONS`, `OPEN_BROWSER`, `CORS_ORIGIN`, and optional community-link variables. For local use, the defaults are generally suitable. Start the backend from the project root:
 
----
-
-# STEP 4 — Vercel Deploy
-
-1. [vercel.com/new](https://vercel.com/new) → repo import karein.
-2. Settings (agar auto-detect na ho):
-   - **Framework Preset:** Other
-   - **Root Directory:** `./`
-   - **Install Command:** `cd frontend && npm install`
-   - **Build Command:** `cd frontend && npm run build`
-   - **Output Directory:** `frontend/dist`
-3. **Environment Variables** (optional, defaults already sahi hain):
-
-| Name | Value |
-|---|---|
-| `GITHUB_OWNER` | `1122bot` |
-| `GITHUB_REPO` | `BILAL-VIP-WA-BUG-BOT-` |
-| `GITHUB_BRANCH` | `main` |
-| `CONFIG_PATH` | `config.json` |
-
-4. **Deploy**.
-
-Permanent URL:
-
-```
-https://bilal-vip-bot.vercel.app
+```sh
+npm start
 ```
 
-### Test
+The `prestart` script builds the frontend before starting the backend. Open `http://localhost:3000`, or use the port configured by `PORT`. The admin console is available at `http://localhost:3000/admin`.
 
-```
-https://bilal-vip-bot.vercel.app/api/health
-```
+## 3. Prepare and push the project to GitHub
 
-```json
-{ "status": true, "service": "BILAL VIP BOT Pairing Proxy", ... }
-```
+Create a new GitHub repository. Keep it private if you do not intend to publish the source. From the project root, initialize Git if the project is not already a repository, then stage and push the source:
 
-Phir site kholein → number daalein → **Create pairing code** → 8-character code.
-
----
-
-# STEP 5 — Panel Change Karna
-
-1. GitHub → `config.json` → Edit
-2. `panel_backend_url` = naya panel URL
-3. Commit
-
-Vercel domain **same**. Changes ~30–60 second mein live (har request par fresh fetch).
-
-> Agar naye panel ka `API_SECRET` different hai to `config.json` mein wo bhi update karein.
-
----
-
-# STEP 6 — Admin Panel & Free Mode
-
-URL: `https://<panel-host>/admin` (ya Vercel domain + `/admin`)
-
-- **Free Mode ON** → koi bhi guest pairing kar sakta hai
-- **Free Mode OFF** → sirf access-key / premium users pair kar sakte hain
-- **Access Keys** → admin panel se keys generate / revoke karein
-- **Sessions** → connected numbers, logs, remove session
-
-Free mode toggle panel ke `backend/site-settings.json` mein save hota hai
-(`{ "freeMode": true }`).
-
----
-
-# STEP 7 — Session Persistence (Restart Test)
-
-`backend/mongo-session.js` har 45 second mein `backend/sessions/<number>/` ka content
-MongoDB collection **`sessionbackups`** mein save karta hai.
-
-Panel restart par:
-
-1. `mongoSessions.init()` connect
-2. `restoreAll()` missing session folders wapas likhta hai
-3. `boot()` phir har session ko connect karta hai
-
-Console:
-
-```
-[mongo] 1 session(s) restored from MongoDB
+```sh
+git init
+git add .
+git status
+git commit -m "Prepare project for deployment"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+git push -u origin main
 ```
 
-User ko **dobara pair nahi karna padta**.
+If Git is already initialized, skip `git init`. If a remote already exists, do not add it again; check it with `git remote -v`.
 
----
+Before committing, inspect `git status` and verify that no `.env`, WhatsApp session credentials, access data, or other private files are staged. The repository `.gitignore` excludes `.env`, session directories, `backend/user-data/`, website data, dependencies, and generated build output. Never force-add ignored secrets or runtime data. If private credentials have already been pushed, remove them from the repository and rotate or relink the affected credentials; deleting a file in a later commit does not erase it from Git history.
 
-# 🔧 Troubleshooting
+## 4. Deploy the backend to a Node.js host
 
-| Problem | Hal |
-|---|---|
-| `CONFIG_FETCH_FAILED` | Repo/branch/path ya `config.json` ka JSON check karein |
-| `PANEL_UNREACHABLE` | `panel_backend_url` ghalat / panel band / port block |
-| `PANEL_TIMEOUT` | Panel slow — Vercel function timeout (Hobby 10s, Pro 30s) |
-| `FREE_MODE_OFF` | Admin panel se Free Mode ON karein ya access key dein |
-| `Start a guest session...` | Free mode off hai — access key se login karein |
-| Admin login `503` | `ADMIN_PASSWORD` 32 characters se chhota hai |
-| `This number is already connected` | Session pehle se active — admin se remove karein |
-| `Too many requests` | Built-in rate limit (5/min IP) — thoda wait karein |
-| Sessions restart par gayab | `MONGODB_URI` set nahi / Atlas IP allow nahi |
-| Frontend "Backend connection required" | `config.json` URL ya Vercel proxy check karein |
+The backend runs from the repository root, not from `frontend/`. On your Node.js hosting provider:
 
----
+1. Connect the GitHub repository or upload the project source.
+2. Set the project/root directory to the repository root.
+3. Install dependencies in both directories before starting the service:
 
-# 🔐 Security Checklist
+   ```sh
+   npm install
+   npm --prefix frontend install
+   ```
 
-- [ ] `API_SECRET` 32+ random characters, panel aur `config.json` dono mein same
-- [ ] `ADMIN_PASSWORD` 32+ characters, default **kabhi** na rakhein
-- [ ] `.env` kabhi commit na karein (`.gitignore` already block karta hai)
-- [ ] MongoDB password strong + Atlas access controlled
-- [ ] `/admin` ka URL public na share karein
-- [ ] Panel HTTPS par chalaayein (Cloudflare / reverse proxy)
+   Set `npm start` as the start command. It runs the frontend build before starting the backend.
+4. Configure the environment variables from `.env.example` in the provider's environment-variable settings. At minimum, set:
+   - `HOST=0.0.0.0`
+   - `PORT` to the port required by the provider
+   - `ADMIN_PASSWORD` to a unique random secret of at least 32 characters
+   - `CORS_ORIGIN` to the exact frontend origin after the Vercel deployment is created
+5. Enable persistent storage and keep the backend's runtime data between restarts and deployments. In particular, preserve `backend/sessions/`, `backend/user-data/`, and the backend data files such as `backend/website-data.json` and `backend/site-settings.json`.
+6. Configure a public HTTPS URL for the backend and confirm that the service stays running.
 
-> **Note:** Jo `.env` aap ne share kiya tha us mein real `ADMIN_PASSWORD` hash aur
-> channel links thay. Us password ko **rotate** kar dein aur `.env` ko repo se bahar rakhein.
+The backend uses `PORT` for its HTTP server. If the provider assigns the port automatically, use the provider's required environment variable mapping. Never expose `.env` or `ADMIN_PASSWORD` through a public URL or frontend setting.
 
----
+For local development, `CORS_ORIGIN` can be empty when using the dashboard served by the backend itself. For a separately hosted frontend, list each exact frontend origin separated by commas, for example:
 
-# 📌 Limits & Notes
+```text
+CORS_ORIGIN=https://your-project.vercel.app,https://www.example.com
+```
 
-1. **Vercel Hobby** par function timeout 10s hai. Pairing usually 2–5s leta hai; slow panel
-   par Pro plan (30s) behtar hai.
-2. `api/pair.js` har request par ek guest session banata hai (free mode ON hone par).
-   Panel expired guest tokens khud prune karta hai.
-3. Ek WhatsApp number ek waqt mein ek hi jagah connected reh sakta hai.
-4. Baileys unofficial library hai — WhatsApp ToS ki paband rahein, spam na karein.
+Do not include a path or trailing slash in an origin.
+
+### Pterodactyl setup
+
+When running the backend in a Pterodactyl panel:
+
+1. Create or select a server that uses a compatible Node.js egg and Node.js 18 or later.
+2. In the server's **Network** page, note the primary allocation's port. If no allocation is available, ask the panel administrator to assign one.
+3. In the server's **Startup** settings or environment variables, set:
+
+   ```text
+   HOST=0.0.0.0
+   PORT=<the primary allocation port from Network>
+   ADMIN_PASSWORD=<a unique random secret of at least 32 characters>
+   CORS_ORIGIN=<the exact Vercel frontend origin>
+   ```
+
+   Replace the placeholders with actual values; do not include angle brackets. The `PORT` value must match the server's allocated port. `HOST` must remain `0.0.0.0` so the application listens on the container interface; do not put the panel domain or node IP in `HOST`.
+4. Upload or deploy the project to the server's root directory. Install the root dependencies and frontend dependencies (`npm install` and `npm --prefix frontend install`) if they are not installed as part of deployment.
+5. Set the Pterodactyl startup command to `npm start`. The root `prestart` script builds the frontend before starting the backend.
+6. To identify the public server address, use the allocation details shown by the panel (and, if needed, the node IP shown in the panel's node/server information). The panel's own domain is the management interface; it is not automatically the backend API domain. If using a custom API domain, point its DNS to the appropriate public server IP and configure routing/proxying to the allocated port.
+7. Check that the server is online and the backend is reachable at its public address. Set Vercel's `BACKEND_API_URL` to that public backend URL. Prefer an HTTPS domain/reverse proxy, for example `https://api.example.com`. A direct `http://IP:PORT` endpoint may be blocked by browsers when the frontend is served over HTTPS.
+
+The IP address is for determining/routing the public backend address, not for `HOST`. The assigned Pterodactyl allocation port is the value for `PORT`. If a reverse proxy terminates HTTPS on a domain, use that HTTPS domain as `BACKEND_API_URL`; the proxy must forward requests to the Pterodactyl server and allocated port.
+
+## 5. Deploy the frontend from GitHub to Vercel
+
+1. In Vercel, choose **Add New → Project** and import the GitHub repository.
+2. In the project configuration, set **Root Directory** to `frontend`. Confirm that Vercel uses the `frontend/` directory, where `vercel.json` and `package.json` are located.
+3. The included `frontend/vercel.json` specifies:
+   - Install command: `npm install`
+   - Build command: `npm run build`
+   - Output directory: `dist`
+4. Under **Environment Variables**, add:
+   - Name: `BACKEND_API_URL`
+   - Value: your public backend URL, such as `https://api.example.com`
+
+   Use the backend's HTTPS URL, with a port in the URL only if that port is publicly reachable and required. This value is embedded in the frontend at build time, so add or change it in Vercel and redeploy after changes.
+5. Deploy the project. After deployment, copy the exact Vercel origin (for example, `https://your-project.vercel.app`) into the backend's `CORS_ORIGIN` environment variable. Include any custom frontend domain as an additional origin.
+6. Restart or redeploy the backend after changing its environment variables. Redeploy the frontend after changing `BACKEND_API_URL`.
+7. Open the Vercel URL and test the connection. If the dashboard asks for a backend URL, verify `BACKEND_API_URL`, ensure the backend is publicly reachable over HTTPS, and check the backend's `CORS_ORIGIN`.
+
+Vercel keeps the project linked to GitHub. Later pushes to the configured production branch trigger a new production deployment; pull requests and other branches can receive preview deployments according to the Vercel project's Git settings.
+
+Do not add `ADMIN_PASSWORD` or WhatsApp credentials to Vercel. Only the public backend URL belongs in the frontend's build configuration.
+
+## 6. Configure the admin console
+
+Open `https://your-project.vercel.app/admin` and sign in with the backend's `ADMIN_PASSWORD`. The admin console can configure Free Mode and manage user access keys and WhatsApp sessions.
+
+- Free Mode is controlled in the admin console and saved by the backend. On a fresh installation with no saved setting, Free Mode starts enabled.
+- With Free Mode disabled, users need an access key created by an admin.
+- Keep backend runtime data persistent: access keys, ownership records, and audit logs are stored in `backend/website-data.json`; Free Mode settings are stored in `backend/site-settings.json`.
+- Back up private runtime data securely. Do not commit it to GitHub or include it in frontend assets.
+
+## Troubleshooting
+
+- **Vercel build fails:** Confirm the Vercel Root Directory is `frontend` and the build output is `dist`.
+- **Frontend cannot connect to the backend:** Confirm `BACKEND_API_URL` is a public HTTPS URL, redeploy the frontend, and verify that the backend is running.
+- **Browser reports a CORS error:** Set backend `CORS_ORIGIN` to the exact frontend origin, including the scheme (`https://`) and hostname, then restart the backend.
+- **Pairing or admin state disappears after a host restart:** Configure persistent storage for backend session and website data files.
+- **The backend cannot start:** Check the provider's logs, its Node.js version, required environment variables, and assigned port.
