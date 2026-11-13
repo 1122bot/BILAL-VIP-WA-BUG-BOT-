@@ -153,6 +153,17 @@ module.exports = async function handler(req, res) {
 
     const guest = await guestResponse.json().catch(() => ({}));
 
+    // Panel par hamari script nahi chal rahi (Express HTML 404) — saaf message
+    if (guestResponse.status === 404) {
+      return json(res, 503, {
+        status: false,
+        error: 'PANEL_NOT_READY',
+        message:
+          'Is panel par BILAL VIP BOT script abhi deploy nahi hai (ya koi doosri app chal rahi hai). Panel par script start karein.',
+        panel: backend,
+      });
+    }
+
     if (!guestResponse.ok) {
       return json(res, guestResponse.status, {
         status: false,
