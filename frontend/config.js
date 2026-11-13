@@ -1,1 +1,0 @@
-window.BILAL_API_URL = "";

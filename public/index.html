@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#05070a" />
+  <title>BILAL VIP BOT — WhatsApp Pairing</title>
+  <meta name="description" content="Get your WhatsApp pairing code instantly. Fast, secure and free." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2300e5a0'/%3E%3Cpath d='M9 22V10h5.6c2.4 0 3.8 1.1 3.8 3 0 1.3-.7 2.2-1.8 2.6 1.4.4 2.2 1.4 2.2 2.9 0 2.1-1.5 3.5-4.1 3.5H9zm2.6-7.1h2.6c1 0 1.6-.5 1.6-1.3s-.6-1.3-1.6-1.3h-2.6v2.6zm0 4.9h2.9c1.1 0 1.8-.5 1.8-1.4s-.7-1.4-1.8-1.4h-2.9v2.8z' fill='%2304140f'/%3E%3C/svg%3E" />
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+  <div class="bg-fx"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb--a"></div>
+  <div class="bg-orb bg-orb--b"></div>
+
+  <div class="page">
+    <!-- ----------------------------- topbar ----------------------------- -->
+    <header class="topbar">
+      <div class="shell topbar__inner">
+        <a class="brand" href="/">
+          <span class="brand__mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#00e5a0">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+          </span>
+          <span class="brand__text">
+            <span class="brand__name" id="brandName">BILAL VIP BOT</span>
+            <span class="brand__sub">WhatsApp Pairing</span>
+          </span>
+        </a>
+
+        <nav class="topbar__nav">
+          <a class="btn btn--ghost" href="/admin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <span class="btn-label">Admin Panel</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page__main">
+      <div class="shell">
+        <!-- ----------------------------- hero ----------------------------- -->
+        <section class="hero">
+          <span class="pill"><span class="pill__dot"></span> Live &amp; Ready</span>
+          <h1 class="hero__title">
+            Connect WhatsApp<br />
+            in <span class="grad">seconds</span>
+          </h1>
+          <p class="hero__lead">
+            Enter your number with country code and get your pairing code instantly.
+            No QR scanning, no waiting.
+          </p>
+        </section>
+
+        <!-- -------------------------- pairing card ------------------------ -->
+        <section class="card card--glow pair-card">
+          <div class="pair-card__head">
+            <div>
+              <h2 class="pair-card__title">Get Pairing Code</h2>
+              <p class="pair-card__hint">Use the number linked to your WhatsApp account</p>
+            </div>
+            <span class="badge badge--ok" id="statusBadge"><span class="badge__dot"></span> Online</span>
+          </div>
+
+          <form id="pairForm" novalidate>
+            <div class="field">
+              <label class="field__label" for="phoneInput">WhatsApp Number</label>
+              <div class="input-row">
+                <div class="input-shell" id="phoneShell">
+                  <div class="cc" id="cc">
+                    <button type="button" class="cc__btn" id="ccBtn" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="cc__flag" id="ccFlag">🇵🇰</span>
+                      <span class="cc__code" id="ccCode">+92</span>
+                      <svg class="cc__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="cc__panel" id="ccPanel">
+                      <input class="cc__search" id="ccSearch" type="text" placeholder="Search country…" autocomplete="off" />
+                      <div class="cc__list" id="ccList" role="listbox"></div>
+                    </div>
+                  </div>
+                  <input id="phoneInput" type="tel" inputmode="numeric" autocomplete="tel-national"
+                         placeholder="300 1234567" maxlength="16" aria-label="WhatsApp number" />
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn--primary btn--block" id="pairBtn" type="submit">
+              <span id="pairBtnLabel">Get Pairing Code</span>
+            </button>
+          </form>
+
+          <div id="alertBox"></div>
+
+          <!-- result -->
+          <div class="result" id="result" hidden>
+            <div class="result__label">Your Pairing Code</div>
+            <div class="code-box" id="codeBox" role="button" tabindex="0" title="Click to copy">
+              <span class="code-box__value" id="codeValue">————</span>
+              <span class="code-box__copy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copy
+              </span>
+            </div>
+            <p class="result__meta">For <strong id="resultPhone">—</strong> · tap the code to copy</p>
+          </div>
+        </section>
+
+        <!-- ----------------------------- steps ---------------------------- -->
+        <div class="section-head">
+          <div class="section-head__eyebrow">How it works</div>
+          <h2>Three simple steps</h2>
+          <p>You'll be connected before you finish reading this.</p>
+        </div>
+
+        <section class="steps">
+          <article class="step">
+            <div class="step__num">1</div>
+            <h3>Enter your number</h3>
+            <p>Pick your country and type your WhatsApp number without the leading zero.</p>
+          </article>
+          <article class="step">
+            <div class="step__num">2</div>
+            <h3>Copy the code</h3>
+            <p>Tap “Get Pairing Code” and copy the 8-character code that appears.</p>
+          </article>
+          <article class="step">
+            <div class="step__num">3</div>
+            <h3>Link the device</h3>
+            <p>Open WhatsApp → Linked devices → Link with phone number, then enter the code.</p>
+          </article>
+        </section>
+      </div>
+    </main>
+
+    <!-- ----------------------------- footer ----------------------------- -->
+    <footer class="footer">
+      <div class="shell footer__inner">
+        <p class="footer__note">© <span id="year">2026</span> <span id="brandFooter">BILAL VIP BOT</span> · All rights reserved</p>
+        <div class="footer__links" id="communityLinks">
+          <a class="chip-link" href="https://t.me/bilal_king_vip" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3 19 19.1c-.2 1-.8 1.2-1.6.8l-4.5-3.3-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.5 13.1l-4.4-1.4c-1-.3-1-1 .2-1.4l17.2-6.6c.8-.3 1.5.2 1.4 1.6z"/></svg>
+            Telegram
+          </a>
+          <a class="chip-link" href="https://whatsapp.com/channel/0029Vaj3Xnu17EmtDxTNnQ0G" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.1-.2 0-.4.1-.5l.6-.7c.1-.2.1-.3 0-.5l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.4-.3.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.9 4.4 3.9 2.2.9 2.6.7 3.1.7.5 0 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2 0-.1-.2-.2-.4-.3z"/></svg>
+            Channel
+          </a>
+          <a class="chip-link" href="https://t.me/bilal_babar_982" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Owner
+          </a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

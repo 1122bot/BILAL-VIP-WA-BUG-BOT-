@@ -1,46 +1,13 @@
 {
-  "name": "tdxself-master",
-  "version": "1.0.0",
-  "description": "\"This project was created with the aim of further learning regarding WhatsApp bots with Baileys\"",
-  "keywords": [],
+  "name": "bilal-vip-bot-pairing",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Permanent Vercel domain for BILAL VIP BOT — WhatsApp pairing page + admin panel + zero-cache reverse proxy.",
   "license": "ISC",
-  "author": "\"devorsixcore & all contributor in tdx-corporation\"",
-  "type": "commonjs",
-  "main": "backend/index.js",
-  "scripts": {
-    "prestart": "npm --prefix frontend run build",
-    "start": "node backend/index.js"
+  "engines": {
+    "node": ">=18"
   },
-  "dependencies": {
-    "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "github:rennshit/baileys",
-    "axios": "^1.12.2",
-    "cfonts": "^3.3.1",
-    "chalk": "4.1.2",
-    "child_process": "^1.0.2",
-    "crpyto": "^0.0.1-security",
-    "fake-useragent": "^1.0.1",
-    "file-type": "^16.5.3",
-    "fluent-ffmpeg": "^2.1.3",
-    "fs": "^0.0.1-security",
-    "human-readable": "^0.2.1",
-    "jimp": "^1.6.1",
-    "libphonenumber-js": "^1.12.18",
-    "moment-timezone": "^0.6.0",
-    "node-cache": "^5.1.2",
-    "node-fetch": "^2.6.1",
-    "node-os-utils": "^1.3.7",
-    "node-webpmux": "^3.2.1",
-    "os": "^0.1.2",
-    "path": "^0.12.7",
-    "performance-now": "^2.1.0",
-    "pino": "^9.11.0",
-    "readline": "^1.3.0",
-    "repl": "^0.1.3",
-    "spinnies": "^0.5.1",
-    "util": "^0.12.5",
-    "uuid": "^3.2.1",
-    "ws": "^8.18.1",
-    "yt-search": "^2.13.1"
+  "scripts": {
+    "dev": "vercel dev"
   }
 }
