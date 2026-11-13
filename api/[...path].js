@@ -129,9 +129,26 @@ module.exports = async function handler(req, res) {
     });
 
     const buffer = Buffer.from(await upstream.arrayBuffer());
+    const contentType = upstream.headers.get('content-type') || '';
+
+    // Panel par hamari script deploy nahi hai (ya galat app chal rahi hai):
+    // Express ka HTML 404 aata hai. Usay saaf JSON error mein badal dete hain.
+    if (upstream.status === 404 && /text\/html/i.test(contentType)) {
+      res.status(503);
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('X-Panel-Backend', backend);
+      return res.end(
+        JSON.stringify({
+          status: false,
+          error: 'PANEL_NOT_READY',
+          message:
+            'Is panel par BILAL VIP BOT script abhi deploy nahi hai (ya koi doosri app chal rahi hai). Panel par script start karein.',
+          panel: backend,
+        })
+      );
+    }
 
     res.status(upstream.status);
-    const contentType = upstream.headers.get('content-type');
     if (contentType) res.setHeader('Content-Type', contentType);
     res.setHeader('X-Panel-Backend', backend);
     res.end(buffer);
