@@ -1,5 +1,5 @@
 {
-  "panel_backend_url": "https://your-panel-url.com",
+  "panel_backend_url": "http://panel.pterodactyl.cloud:4661",
   "api_secret": "CHANGE_ME_TO_A_LONG_RANDOM_SECRET",
   "brand_name": "BILAL VIP BOT"
 }
