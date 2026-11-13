@@ -1,0 +1,5 @@
+{
+  "panel_backend_url": "https://panel-1.example.com",
+  "api_secret": "CHANGE_ME_TO_A_LONG_RANDOM_SECRET",
+  "brand_name": "BILAL VIP BOT"
+}

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b0b0d">
+    <meta name="description" content="BILAL VIP BOT administrator console.">
+    <title>Admin Console · BILAL VIP BOT</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <main class="shell admin-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="BILAL VIP BOT home">
+          <span class="brand-mark">B</span>
+          <span class="brand-copy"><strong>BILAL</strong><small>ADMIN CONSOLE</small></span>
+        </a>
+        <a class="admin-link" href="/">User dashboard</a>
+      </header>
+
+      <section id="admin-login-view" class="panel admin-login-view">
+        <p class="eyebrow">RESTRICTED ACCESS</p>
+        <h1>Administrator<br><span>sign in.</span></h1>
+        <p class="hero-copy">Sign in to manage access keys, pairing settings, connected numbers, and recent activity.</p>
+        <form id="admin-login-form" class="admin-login-form">
+          <label for="admin-password">Admin password</label>
+          <div class="input-wrap"><input id="admin-password" type="password" autocomplete="current-password" placeholder="Enter admin password" required></div>
+          <button id="admin-login-button" class="button button-primary" type="submit"><span>Sign in securely</span><span aria-hidden="true">↗</span></button>
+        </form>
+      </section>
+
+      <div id="admin-dashboard" hidden>
+        <section class="admin-heading">
+          <div>
+            <p class="eyebrow">CONTROL CENTER</p>
+            <h1>Workspace <span>overview.</span></h1>
+            <p class="hero-copy">Manage access, monitor connected numbers, and review recent activity.</p>
+          </div>
+          <div class="admin-heading-actions">
+            <button id="admin-refresh-button" class="refresh-button" type="button">↻ <span>Refresh</span></button>
+            <button id="admin-logout-button" class="refresh-button" type="button">Sign out</button>
+          </div>
+        </section>
+
+        <p id="admin-message" class="inline-message" role="status" hidden></p>
+        <p id="admin-last-updated" class="admin-last-updated" aria-live="polite"></p>
+
+        <nav class="admin-nav" aria-label="Admin sections">
+          <a href="#admin-overview">Overview</a>
+          <a href="#admin-access">Access keys</a>
+          <a href="#admin-whatsapp">Manage devices</a>
+          <a href="#admin-activity">Activity log</a>
+        </nav>
+
+        <section id="admin-overview" class="admin-stats" aria-label="System overview">
+          <article class="stat-card accent"><span class="stat-label">Free Mode</span><strong id="admin-free-mode">—</strong></article>
+          <article class="stat-card"><span class="stat-label">Active keys</span><strong id="admin-key-count">0</strong></article>
+          <article class="stat-card"><span class="stat-label">Active sessions</span><strong id="admin-session-count">0</strong></article>
+          <article class="stat-card"><span class="stat-label">Guest sessions</span><strong id="admin-guest-count">0</strong></article>
+        </section>
+
+        <section class="panel admin-mode-panel">
+          <div>
+            <p class="eyebrow">PAIRING ACCESS</p>
+            <h2>Free Mode</h2>
+            <p id="admin-mode-description">Loading mode...</p>
+          </div>
+          <button id="admin-mode-toggle" class="button button-secondary" type="button">Change mode</button>
+        </section>
+
+        <section id="admin-access" class="panel admin-section">
+          <div class="section-heading">
+            <div><p class="eyebrow">USER ACCESS</p><h2>Access keys</h2><p class="admin-section-description">Rename keys to keep them organized, or revoke access immediately.</p></div>
+          </div>
+          <form id="create-key-form" class="create-key-form">
+            <label for="key-label">Key label</label>
+            <input id="key-label" type="text" maxlength="80" placeholder="e.g. Customer / account name" required>
+            <button class="button button-primary" type="submit"><span>Create key</span><span aria-hidden="true">＋</span></button>
+          </form>
+          <div id="new-key-result" class="new-key-result" hidden aria-live="polite"></div>
+          <div class="admin-toolbar">
+            <label class="admin-filter" for="key-search">Search keys<input id="key-search" type="search" placeholder="Label"></label>
+            <label class="admin-filter" for="key-status-filter">Status
+              <select id="key-status-filter">
+                <option value="all">All keys</option>
+                <option value="active">Active</option>
+                <option value="revoked">Revoked</option>
+              </select>
+            </label>
+            <span id="key-results-count" class="admin-results-count"></span>
+          </div>
+          <div id="keys-list" class="admin-list"></div>
+        </section>
+
+        <section id="admin-whatsapp" class="panel admin-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">WHATSAPP</p>
+              <h2>Manage devices</h2>
+              <p class="admin-section-description">Filter by connection status or account owner. Disconnecting a device signs it out and removes its saved session; pair it again to reconnect.</p>
+            </div>
+          </div>
+          <div class="admin-toolbar">
+            <label class="admin-filter" for="session-search">Search sessions<input id="session-search" type="search" placeholder="Number or owner"></label>
+            <label class="admin-filter" for="session-status-filter">Connection status
+              <select id="session-status-filter">
+                <option value="all">All statuses</option>
+                <option value="connected">Connected</option>
+                <option value="connecting">Connecting</option>
+                <option value="waiting_for_pairing">Awaiting pairing</option>
+                <option value="pairing_code_issued">Pairing code issued</option>
+                <option value="disconnected">Disconnected</option>
+                <option value="logged_out">Logged out</option>
+                <option value="needs_repair">Needs repair</option>
+              </select>
+            </label>
+            <span id="session-results-count" class="admin-results-count"></span>
+          </div>
+          <div id="admin-sessions-list" class="admin-list"></div>
+        </section>
+
+        <section id="admin-activity" class="panel admin-section">
+          <div class="section-heading admin-log-heading">
+            <div><p class="eyebrow">AUDIT TRAIL</p><h2>Activity log</h2><p class="admin-section-description">Review administrative actions and export the latest audit entries.</p></div>
+            <button id="export-logs-button" class="refresh-button" type="button">↓ <span>Export CSV</span></button>
+          </div>
+          <div class="admin-toolbar">
+            <label class="admin-filter" for="log-search">Search activity<input id="log-search" type="search" placeholder="Action or details"></label>
+            <span id="log-results-count" class="admin-results-count"></span>
+          </div>
+          <div id="admin-logs-list" class="admin-list log-list"></div>
+        </section>
+      </div>
+
+      <dialog id="message-log-dialog" class="message-log-dialog" aria-labelledby="message-log-title">
+        <div class="message-log-header">
+          <div>
+            <p class="eyebrow">MESSAGE HISTORY</p>
+            <h2 id="message-log-title">WhatsApp messages</h2>
+            <p id="message-log-number" class="admin-section-description"></p>
+          </div>
+          <button id="message-log-close" class="refresh-button" type="button" aria-label="Close message history">Close</button>
+        </div>
+        <div class="message-log-toolbar">
+          <label class="admin-filter" for="message-log-search">Search messages<input id="message-log-search" type="search" placeholder="Text, sender, or chat"></label>
+          <button id="message-log-refresh" class="refresh-button" type="button">↻ <span>Refresh</span></button>
+          <span id="message-log-count" class="admin-results-count"></span>
+        </div>
+        <p id="message-log-status" class="admin-section-description" role="status"></p>
+        <ol id="message-log-list" class="message-log-list"></ol>
+        <p class="message-log-retention">Recent messages are kept in memory (up to 200 per number) and cleared when the bot restarts or the number is removed.</p>
+      </dialog>
+
+      <footer class="footer"><span>© <span id="year"></span> BILAL VIP BOT</span><a class="admin-link" href="/">Back to pairing</a></footer>
+    </main>
+    <script src="/config.js"></script>
+    <script src="/admin.js"></script>
+  </body>
+</html>
